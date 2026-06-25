@@ -1,103 +1,69 @@
-// Pantallas
-const loginScreen = document.getElementById('login-screen');
-const registerScreen = document.getElementById('register-screen');
-const dashboardScreen = document.getElementById('dashboard-screen');
+// Esperar a que la API de Google esté completamente cargada
+window.onload = function () {
+    google.accounts.id.initialize({
+        client_id: "720907761269-r3j5mmfmjk81nd6nr1lnbkodgg94k1n4.apps.googleusercontent.com", // Reemplazá esto con tu ID de cliente real
+        callback: handleCredentialResponse
+    });
 
-// Enlaces de navegación
-const goToRegister = document.getElementById('go-to-register');
-const goToLogin = document.getElementById('go-to-login');
+    google.accounts.id.renderButton(
+        document.getElementById("buttonDiv"),
+        { theme: "outline", size: "large", type: "standard" } // Configuración estética del botón
+    );
 
-// Botones y Formulario
-const btnLogin = document.getElementById('btn-google-login');
-const btnLogout = document.getElementById('btn-logout');
-const registerForm = document.getElementById('register-form');
+    // Mostrar el botón de inicio de sesión de inmediato
+    google.accounts.id.prompt(); 
 
-// Campos del Dashboard
-const empId = document.getElementById('emp-id');
-const empFullname = document.getElementById('emp-fullname');
-const empEmail = document.getElementById('emp-email');
-const empSalary = document.getElementById('emp-salary');
+    // Configurar el botón de cerrar sesión
+    document.getElementById("btn-logout").addEventListener("click", logout);
+};
 
-// --- NAVEGACIÓN ---
-goToRegister.addEventListener('click', (e) => {
-    e.preventDefault();
-    loginScreen.classList.add('hidden');
-    registerScreen.classList.remove('hidden');
-});
+// Función que maneja la respuesta de Google tras el login exitoso
+function handleCredentialResponse(response) {
+    // Decodificamos el JWT para obtener los datos del usuario
+    const responsePayload = decodeJwt(response.credential);
 
-goToLogin.addEventListener('click', (e) => {
-    e.preventDefault();
-    registerScreen.classList.add('hidden');
-    loginScreen.classList.remove('remove'); // Corrige a remoción normal
-    loginScreen.classList.remove('hidden');
-});
-
-// --- ACCIÓN: REGISTRAR ---
-registerForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-
-    const nuevoEmpleado = {
-        id: document.getElementById('reg-id').value,
-        nombre: document.getElementById('reg-nombre').value,
-        apellido: document.getElementById('reg-apellido').value,
-        correo: document.getElementById('reg-correo').value,
-        sueldo: document.getElementById('reg-sueldo').value
+    // --- BASE DE DATOS SIMULADA ---
+    // Como el sueldo y el ID no vienen de Google, los definimos acá
+    // En el futuro, harías un fetch() a tu servidor usando el email para buscar estos datos
+    const datosBaseDeDatos = {
+        idEmpleado: "EMP-2026-094",
+        sueldo: "450.000,00"
     };
 
-    try {
-        // REEMPLAZAR URL CON TU BACKEND REAL
-        const response = await fetch('http://localhost:3000/api/registrar', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(nuevoEmpleado)
-        });
+    // Insertar los datos en el HTML
+    document.getElementById("emp-id").textContent = datosBaseDeDatos.idEmpleado;
+    document.getElementById("emp-fullname").textContent = responsePayload.name; // Trae Nombre y Apellido juntos
+    document.getElementById("emp-email").textContent = responsePayload.email;
+    document.getElementById("emp-salary").textContent = datosBaseDeDatos.sueldo;
 
-        if (response.ok) {
-            alert('¡Empleado registrado con éxito! Ahora puedes iniciar sesión.');
-            registerForm.reset();
-            registerScreen.classList.add('hidden');
-            loginScreen.classList.remove('hidden');
-        } else {
-            alert('Error al registrar el empleado.');
-        }
-    } catch (error) {
-        console.error('Error de conexión:', error);
-        alert('No se pudo conectar con el servidor.');
-    }
-});
+    // Intercambiar pantallas (ocultar login, mostrar dashboard)
+    document.getElementById("login-screen").classList.add("hidden");
+    document.getElementById("dashboard-screen").classList.remove("hidden");
+}
 
-// --- ACCIÓN: LOGEARSE (Simulado/Real) ---
-btnLogin.addEventListener('click', async () => {
-    try {
-        // Aquí llamarías a la autenticación de Google. Al obtener el correo:
-        const correoGoogle = "juan.perez@empresa.com"; // Simulación de respuesta Google
+// Función auxiliar para decodificar el token JWT de Google de forma nativa
+function decodeJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+        return '%' + ('0' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
 
-        // REEMPLAZAR URL CON TU BACKEND REAL (Busca los datos por correo)
-        const response = await fetch(`http://localhost:3000/api/empleado/${correoGoogle}`);
-        
-        if (response.ok) {
-            const empleado = await response.json();
+    return JSON.parse(jsonPayload);
+}
 
-            // Inyectamos los datos reales traídos de MySQL
-            empId.textContent = empleado.id;
-            empFullname.textContent = `${empleado.nombre} ${empleado.apellido}`;
-            empEmail.textContent = empleado.correo;
-            empSalary.textContent = empleado.sueldo;
+// Función para cerrar sesión
+function logout() {
+    // Limpiar los campos del HTML por seguridad
+    document.getElementById("emp-id").textContent = "-";
+    document.getElementById("emp-fullname").textContent = "-";
+    document.getElementById("emp-email").textContent = "-";
+    document.getElementById("emp-salary").textContent = "-";
 
-            // Cambiamos al panel
-            loginScreen.classList.add('hidden');
-            dashboardScreen.classList.remove('hidden');
-        } else {
-            alert('El usuario no está registrado en el sistema.');
-        }
-    } catch (error) {
-        console.error('Error al iniciar sesión:', error);
-        alert('Error en el servidor.');
-    }
-});
-
-// --- ACCIÓN: CERRAR SESIÓN ---
-btnLogout.addEventListener('click', () => {
-    loginScreen.classList.remove('hidden');
-    dashboardScreen.classList.add('hidden');
-});
+    // Intercambiar pantallas de nuevo
+    document.getElementById("dashboard-screen").classList.add("hidden");
+    document.getElementById("login-screen").classList.remove("hidden");
+    
+    // Opcional: Deshabilitar el inicio automático de Google si se deslogueó a propósito
+    google.accounts.id.disableAutoSelect();
+}
