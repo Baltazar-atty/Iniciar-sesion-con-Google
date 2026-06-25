@@ -2,50 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Empleados</title>
-    <link rel="stylesheet" href="estilo.css">
+    <title><center>Login con Google</center></title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <section id="login-screen" class="container">
-        <h1>Iniciar Sesión</h1>
-        <button id="btn-google-login" class="btn-google">
-            <img src="img/google.jpg" alt="Google logo" width="20">
-            Iniciar sesión con Google
-        </button>
-        <p>¿No tienes cuenta? <a href="#" id="go-to-register">Regístrate aquí</a></p>
-    </section>
+    <h2>Inicia sesión en mi página</h2>
 
-    <section id="register-screen" class="container hidden">
-        <h1>Registro de Empleado</h1>
-        <form id="register-form">
-            <input type="text" id="reg-id" placeholder="ID Empleado (Ej: EMP-2026)" required>
-            <input type="text" id="reg-nombre" placeholder="Nombre" required>
-            <input type="text" id="reg-apellido" placeholder="Apellido" required>
-            <input type="email" id="reg-correo" placeholder="Correo Electrónico" required>
-            <input type="number" id="reg-sueldo" placeholder="Sueldo" step="0.01" required>
+    <div id="g_id_onload"
+         data-client_id="720907761269-r3j5mmfmjk81nd6nr1lnbkodgg94k1n4.apps.googleusercontent.com"
+         data-callback="handleCredentialResponse">
+    </div>
+    
+    <div class="g_id_signin" data-type="standard"></div>
+
+    <script>
+        // 3. La función que recibe la información cuando el usuario se loguea
+        function handleCredentialResponse(response) {
+            console.log("¡Logueado con éxito!");
+            // Este es un token seguro (JWT) que contiene los datos del usuario
+            console.log("Token de Google: " + response.credential);
             
-            <button type="submit" class="btn-submit">Registrar Usuario</button>
-        </form>
-        <p>¿Ya tienes cuenta? <a href="#" id="go-to-login">Inicia sesión</a></p>
-    </section>
-
-    <section id="dashboard-screen" class="container hidden">
-        <header class="dashboard-header">
-            <h2>Panel Principal</h2>
-            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
-        </header>
-        
-        <div class="employee-card">
-            <h3>Datos del Usuario</h3>
-            <p><strong>ID Empleado:</strong> <span id="emp-id">-[Cargando]-</span></p>
-            <p><strong>Nombre Completo:</strong> <span id="emp-fullname">-[Cargando]-</span></p>
-            <p><strong>Correo Electrónico:</strong> <span id="emp-email">-[Cargando]-</span></p>
-            <p><strong>Sueldo Actual:</strong> $<span id="emp-salary">-[Cargando]-</span></p>
-        </div>
-    </section>
-
-    <script src="funcion.js"></script>
+            // TODO: Enviar response.credential a tu servidor para validarlo
+        }
+    </script>
 </body>
 </html>
