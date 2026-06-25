@@ -2,29 +2,36 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title><center>Login con Google</center></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal de Recibos de Sueldo</title>
+    <link rel="stylesheet" href="estilo.css">
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
 
-    <h2>Inicia sesión en mi página</h2>
+    <section id="login-screen" class="container">
+        <h1>Tecnologías del Atlántico S.A.</h1>
+        <h2>Portal de Recibos de Sueldo</h2>
+        <p>Inicie sesión para consultar su información confidencial.</p>
+        
+        <div id="buttonDiv"></div>
+    </section>
 
-    <div id="g_id_onload"
-         data-client_id="720907761269-r3j5mmfmjk81nd6nr1lnbkodgg94k1n4.apps.googleusercontent.com"
-         data-callback="handleCredentialResponse">
-    </div>
-    
-    <div class="g_id_signin" data-type="standard"></div>
+    <section id="dashboard-screen" class="container hidden">
+        <header class="dashboard-header">
+            <h2>Panel del Empleado</h2>
+            <button id="btn-logout" class="btn-logout">Cerrar Sesión</button>
+        </header>
+        
+        <div class="employee-card">
+            <h3>Mis Datos Personales</h3>
+            <p><strong>ID Empleado:</strong> <span id="emp-id">-</span></p>
+            <p><strong>Nombre Completo:</strong> <span id="emp-fullname">-</span></p>
+            <p><strong>Correo Electrónico:</strong> <span id="emp-email">-</span></p>
+            <p><strong>Sueldo Actual:</strong> $<span id="emp-salary">-</span></p>
+        </div>
+    </section>
 
-    <script>
-        // 3. La función que recibe la información cuando el usuario se loguea
-        function handleCredentialResponse(response) {
-            console.log("¡Logueado con éxito!");
-            // Este es un token seguro (JWT) que contiene los datos del usuario
-            console.log("Token de Google: " + response.credential);
-            
-            // TODO: Enviar response.credential a tu servidor para validarlo
-        }
-    </script>
+    <script src="funcion.js"></script>
 </body>
 </html>
