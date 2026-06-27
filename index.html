@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Recibos de Sueldo</title>
     <link rel="stylesheet" href="estilo.css">
-    <!-- Librería Oficial de Google -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
     <style>
-        /* Regla clave para que se puedan ocultar y mostrar las pantallas */
         .hidden {
             display: none !important;
         }
@@ -17,8 +15,7 @@
 </head>
 <body>
 
-    <!-- CONFIGURACIÓN DE INICIO DE SESIÓN DE GOOGLE -->
-    <!-- data-callback conecta el éxito del login con tu función manejarLogin en JS -->
+    <!-- ─── ¡ACÁ VA TU ID! Conecta el éxito del login con manejarLogin ─── -->
     <div id="g_id_onload"
          data-client_id="419208057363-k4fimfm79l5e4odst7gdnil5s8e4tl9s.apps.googleusercontent.com"
          data-callback="manejarLogin"
@@ -31,7 +28,6 @@
         <h2>Portal de Recibos de Sueldo</h2>
         <p>Inicie sesión para consultar su información confidencial.</p>
         
-        <!-- El botón visual automático de Google -->
         <div id="buttonDiv" 
              class="g_id_signin"
              data-type="standard"
@@ -42,7 +38,7 @@
         </div>
     </section>
 
-    <!-- 2. PANTALLA DEL PANEL (Empieza oculta con 'hidden') -->
+    <!-- 2. PANTALLA DEL PANEL -->
     <section id="dashboard-screen" class="container hidden">
         <header class="dashboard-header">
             <h2>Panel del Empleado</h2>
@@ -52,13 +48,13 @@
         <div class="employee-card">
             <h3>Mis Datos Personales</h3>
             <p><strong>ID Empleado:</strong> <span id="emp-id">-</span></p>
-            <p><strong>Nombre Completo:</strong> <span id="emp-fullname">-</span></p>
+            <p><strong>Nombre:</strong> <span id="emp-name">-</span></p>
+            <p><strong>Apellido:</strong> <span id="emp-lastname">-</span></p>
             <p><strong>Correo Electrónico:</strong> <span id="emp-email">-</span></p>
             <p><strong>Sueldo Actual:</strong> $<span id="emp-salary">-</span></p>
         </div>
     </section>
 
-    <!-- Vínculo a tu archivo de lógica de comparación -->
     <script src="funcion.js"></script>
 </body>
 </html>

@@ -1,19 +1,11 @@
-// 1. TU BASE DE DATOS SIMPLIFICADA
-// Reemplazá este correo de ejemplo por el Gmail exacto con el que estás iniciando sesión.
-const baseDeDatos = {
-    "calandronada@gmail.com": { id: "EMP-2026-941", nombre: "Tomás Pérez", sueldo: "450.000,00" },
-    "juan.gomez@gmail.com": { id: "EMP-2026-102", nombre: "Juan Gómez", sueldo: "520.000,00" }
-};
-
 // Vinculamos el botón de cerrar sesión apenas cargue la página
 document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("btn-logout").addEventListener("click", logout);
 });
 
-// 2. LA FUNCIÓN QUE SE EJECUTA AL LOGUEARTE
+// LA FUNCIÓN QUE SE EJECUTA AL LOGUEARTE
 function manejarLogin(response) {
     try {
-        // Rompemos el token de Google de forma segura para caracteres especiales (tildes, eñes)
         const base64Url = response.credential.split('.')[1];
         const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
         const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
@@ -23,31 +15,42 @@ function manejarLogin(response) {
         const usuarioGoogle = JSON.parse(jsonPayload);
         const correoIngresado = usuarioGoogle.email.toLowerCase();
 
-        console.log("Se intentó conectar el correo:", correoIngresado);
+        // ─── CONEXIÓN REAL CON LA BASE DE DATOS ───
+        // Llamamos a nuestro archivo PHP pasándole el mail por la URL
+        fetch(`buscar_empleado.php?email=${correoIngresado}`)
+            .then(res => res.json())
+            .then(empleadoEncontrado => {
+                
+                // Si el PHP nos devuelve un error o no encuentra al usuario
+                if (empleadoEncontrado.error) {
+                    alert("Acceso denegado: " + empleadoEncontrado.error);
+                    return;
+                }
 
-        // Buscamos si el correo existe en nuestra base de datos simulada
-        const empleadoEncontrado = baseDeDatos[correoIngresado];
+                // Si todo está bien, inyectamos los datos reales traídos de la base de datos SQL
+                document.getElementById("emp-id").textContent = empleadoEncontrado.id;
+                document.getElementById("emp-name").textContent = empleadoEncontrado.nombre;
+                document.getElementById("emp-lastname").textContent = empleadoEncontrado.apellido;
+                document.getElementById("emp-email").textContent = empleadoEncontrado.correo_electronico;
+                
+                // Formateamos el número del sueldo para que vuelva a mostrarse lindo con comas
+                const sueldoFormateado = parseFloat(empleadoEncontrado.sueldo).toLocaleString('es-AR', { minimumFractionDigits: 2 });
+                document.getElementById("emp-salary").textContent = sueldoFormateado;
 
-        if (empleadoEncontrado) {
-            // Si existe, inyectamos los datos en el HTML
-            document.getElementById("emp-id").textContent = empleadoEncontrado.id;
-            document.getElementById("emp-fullname").textContent = empleadoEncontrado.nombre;
-            document.getElementById("emp-email").textContent = correoIngresado;
-            document.getElementById("emp-salary").textContent = empleadoEncontrado.sueldo;
+                // Cambiamos de pantalla
+                document.getElementById("login-screen").classList.add("hidden");
+                document.getElementById("dashboard-screen").classList.remove("hidden");
+            })
+            .catch(err => {
+                console.error("Error al conectar con el servidor:", err);
+                alert("Hubo un error de conexión con la base de datos.");
+            });
 
-            // Cambiamos de pantalla (ocultamos login, mostramos panel)
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("dashboard-screen").classList.remove("hidden");
-            console.log("¡Acceso concedido!");
-        } else {
-            alert("Acceso denegado: El correo (" + correoIngresado + ") no está registrado en el sistema.");
-        }
     } catch (error) {
         console.error("Error al procesar el login de Google:", error);
     }
 }
 
-// 3. FUNCIÓN PARA CERRAR SESIÓN
 function logout() {
     document.getElementById("dashboard-screen").classList.add("hidden");
     document.getElementById("login-screen").classList.remove("hidden");
