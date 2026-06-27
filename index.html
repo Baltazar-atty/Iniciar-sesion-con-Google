@@ -5,18 +5,44 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal de Recibos de Sueldo</title>
     <link rel="stylesheet" href="estilo.css">
+    <!-- Librería Oficial de Google -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <style>
+        /* Regla clave para que se puedan ocultar y mostrar las pantallas */
+        .hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body>
 
+    <!-- CONFIGURACIÓN DE INICIO DE SESIÓN DE GOOGLE -->
+    <!-- data-callback conecta el éxito del login con tu función manejarLogin en JS -->
+    <div id="g_id_onload"
+         data-client_id="419208057363-k4fimfm79l5e4odst7gdnil5s8e4tl9s.apps.googleusercontent.com"
+         data-callback="manejarLogin"
+         data-auto_prompt="false">
+    </div>
+
+    <!-- 1. PANTALLA DE LOGIN -->
     <section id="login-screen" class="container">
         <h1>Tecnologías del Atlántico S.A.</h1>
         <h2>Portal de Recibos de Sueldo</h2>
         <p>Inicie sesión para consultar su información confidencial.</p>
         
-        <div id="buttonDiv"></div>
+        <!-- El botón visual automático de Google -->
+        <div id="buttonDiv" 
+             class="g_id_signin"
+             data-type="standard"
+             data-shape="pill"
+             data-theme="outline"
+             data-size="large"
+             data-text="signin_with">
+        </div>
     </section>
 
+    <!-- 2. PANTALLA DEL PANEL (Empieza oculta con 'hidden') -->
     <section id="dashboard-screen" class="container hidden">
         <header class="dashboard-header">
             <h2>Panel del Empleado</h2>
@@ -32,6 +58,7 @@
         </div>
     </section>
 
+    <!-- Vínculo a tu archivo de lógica de comparación -->
     <script src="funcion.js"></script>
 </body>
 </html>

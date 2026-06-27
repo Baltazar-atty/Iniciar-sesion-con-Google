@@ -1,6 +1,6 @@
 // 1. Tu "Base de Datos" simplificada
 const baseDeDatos = {
-    "tu_correo@gmail.com": { id: "NTR-001", nombre: "Tomás", sueldo: "$450.000" },
+    "calandronada@gmail.com": { id: "NTR-001", nombre: "Tomás", sueldo: "$450.000" },
     "juan@gmail.com": { id: "NTR-002", nombre: "Juan", sueldo: "$500.000" }
 };
 
