@@ -1,35 +1,47 @@
 <?php
-// Configuración de la conexión a la base de datos
+header('Content-Type: application/json');
+
+// 1. Conexión a la base de datos
 $host = "localhost";
-$user = "root";       // Cambiá por tu usuario de MySQL (por defecto suele ser root)
-$pass = "";           // Cambiá por tu contraseña de MySQL
-$db   = "login_reitchert"; // Escribí acá el nombre de tu base de datos
+$user = "root";       
+$pass = "";           
+$db   = "login_reitchert"; 
 
 $conn = new mysqli($host, $user, $pass, $db);
 
-// Verificamos la conexión
 if ($conn->connect_error) {
-    die(json_encode(["error" => "Fallo en la conexión: " . $conn->connect_error]));
+    echo json_encode(["success" => false, "message" => "Fallo en la conexión: " . $conn->connect_error]);
+    exit;
 }
 
-// Recibimos el correo que nos manda el JavaScript
-$email = isset($_GET['email']) ? $conn->real_escape_string($_GET['email']) : '';
+// 2. Leer el email dinámico que viene desde el JavaScript (POST JSON)
+$input = json_decode(file_get_contents('php://input'), true);
+$email = isset($input['email']) ? $conn->real_escape_string($input['email']) : '';
 
 if (!empty($email)) {
-    // Buscamos el empleado en la tabla
-    $sql = "SELECT id, nombre, apellido, correo_electronico, sueldo FROM datos_empleado WHERE correo_electronico = '$email'";
+    // 3. Buscamos al empleado usando las columnas con mayúsculas y espacios de tu BD
+    $sql = "SELECT `ID`, `Nombre`, `Apellido`, `Correo electronico`, `Sueldo` FROM `datos_empleado` WHERE `Correo electronico` = '$email'";
     $result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        // Si existe, guardamos los datos en un array
-        $empleado = $result->fetch_assoc();
-        // Lo devolvemos al frontend en formato JSON
-        echo json_encode($empleado);
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        
+        // Estructura limpia para tu JS
+        echo json_encode([
+            "success" => true,
+            "empleado" => [
+                "ID" => $row['ID'],
+                "Nombre" => $row['Nombre'],
+                "Apellido" => $row['Apellido'],
+                "Correo" => $row['Correo electronico'],
+                "Sueldo" => $row['Sueldo']
+            ]
+        ]);
     } else {
-        echo json_encode(["error" => "Empleado no registrado"]);
+        echo json_encode(["success" => false, "message" => "El correo " . $email . " no está registrado en el sistema."]);
     }
 } else {
-    echo json_encode(["error" => "Correo vacío"]);
+    echo json_encode(["success" => false, "message" => "No se recibió ningún correo electrónico."]);
 }
 
 $conn->close();

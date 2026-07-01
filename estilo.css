@@ -18,10 +18,6 @@ body {
     max-width: 450px;
 }
 
-.hidden {
-    display: none !important;
-}
-
 /* Botón Google */
 .btn-google {
     display: flex;
@@ -99,3 +95,7 @@ a {
     text-decoration: none;
 }
 a:hover { text-decoration: underline; }
+
+.hidden {
+    display: none !important;
+}

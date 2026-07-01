@@ -1,50 +1,43 @@
-// Esta función se ejecuta automáticamente cuando el usuario se loguea con Google
 function manejarLogin(response) {
-    // Enviamos el token devuelto por Google a nuestro backend en PHP
-    fetch('login_google.php', {
+    // 1. Decodificar el token de Google para obtener el email real del usuario
+    const payload = JSON.parse(atob(response.credential.split('.')[1]));
+    const emailUsuario = payload.email; // Aquí obtenemos por ejemplo: rodriguito@gmail.com
+    
+    // 2. Apuntamos al nombre REAL de tu archivo PHP
+    fetch('buscar_empleado.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ id_token: response.credential })
+        // Le mandamos el email real en el cuerpo de la petición
+        body: JSON.stringify({ email: emailUsuario })
     })
-    .then(res => res.json())
+    .then(res => res.json()) // Volvemos a poner .json() porque ahora sí va a responder bien
     .then(data => {
         if (data.success) {
-            // 1. Inyectamos los datos del empleado en los spans correspondientes
+            // Inyectamos los datos en tu panel
             document.getElementById('emp-id').innerText = data.empleado.ID;
             document.getElementById('emp-name').innerText = data.empleado.Nombre;
             document.getElementById('emp-lastname').innerText = data.empleado.Apellido;
             document.getElementById('emp-email').innerText = data.empleado.Correo;
             document.getElementById('emp-salary').innerText = data.empleado.Sueldo;
 
-            // 2. Ocultamos la pantalla de login y mostramos el panel
+            // Intercambiamos pantallas
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('dashboard-screen').classList.remove('hidden');
         } else {
-            // Si el correo de Gmail no existe en la BD
-            alert("Error de acceso: " + data.message);
+            alert("Error: " + data.message);
         }
     })
     .catch(error => {
-        console.error('Error al conectar con el servidor:', error);
-        alert('Hubo un problema al procesar el inicio de sesión.');
+        console.error('Error:', error);
+        alert('Ocurrió un error al procesar el inicio de sesión.');
     });
 }
 
 // Lógica para el botón "Cerrar Sesión"
 document.getElementById('btn-logout').addEventListener('click', function() {
-    // Limpiamos los textos por seguridad
-    document.getElementById('emp-id').innerText = "-";
-    document.getElementById('emp-name').innerText = "-";
-    document.getElementById('emp-lastname').innerText = "-";
-    document.getElementById('emp-email').innerText = "-";
-    document.getElementById('emp-salary').innerText = "-";
-
-    // Volvemos a intercambiar las pantallas de forma visual
     document.getElementById('dashboard-screen').classList.add('hidden');
     document.getElementById('login-screen').classList.remove('hidden');
-    
-    // Opcional: Recargar la página para limpiar por completo el estado de Google Identity
     location.reload();
 });
